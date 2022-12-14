@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/worklist/static/js/main.79d1a80d.js",
-    "static/media/WFH.jpg": "/worklist/static/media/WFH.94271b8ddf95d2726118.jpg",
+    "main.js": "/worklist/static/js/main.46af1104.js",
+    "static/media/1.png": "/worklist/static/media/1.2ce138b8518b6550b30f.png",
     "index.html": "/worklist/index.html",
-    "main.79d1a80d.js.map": "/worklist/static/js/main.79d1a80d.js.map"
+    "main.46af1104.js.map": "/worklist/static/js/main.46af1104.js.map"
   },
   "entrypoints": [
-    "static/js/main.79d1a80d.js"
+    "static/js/main.46af1104.js"
   ]
 }
