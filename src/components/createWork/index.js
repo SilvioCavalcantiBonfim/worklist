@@ -1,48 +1,53 @@
-import { AspectRatio, 
-    Box, 
-    Button, 
-    Fade, 
-    Flex, 
-    FormControl, 
-    FormHelperText, 
-    FormLabel, 
-    Input, 
-    Modal, 
-    ModalBody, 
-    ModalCloseButton, 
-    ModalContent, 
-    ModalFooter, 
-    ModalHeader, 
-    ModalOverlay, 
-    Tab, 
-    TabList, 
-    TabPanel, 
-    TabPanels, 
-    Tabs, 
-    Textarea} from "@chakra-ui/react";
+import {
+    AspectRatio,
+    Box,
+    Button,
+    Fade,
+    Flex,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs
+} from "@chakra-ui/react";
 import React from "react";
-// import CreateTag from "./createTag";
-import TagGUI from "./Tag";
+import FormTag from "./FormTag";
 import { BsArrowRightCircleFill } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import IMG1 from '../../Images/1.png';
-import CreateGoal from "./createGoal";
+import FormGoal from "./FormGoal";
+import FormTask from "./FormTask";
+import Task from "../../Entity/taskEntity";
 
 const CreateWork = (props) => {
-    const [countChar, setCountChar] = React.useState('');
     const [tabIndex, setTabIndex] = React.useState(0);
-    return (<Modal isOpen={props.isOpen} onClose={props.onClose}>
+
+    const [goal, setGoal] = React.useState([]);
+    const [CurrentTags, setCurrentTags] = React.useState([]);
+    const [task, setTask] = React.useState({ title: '', desciption: '' });
+
+    const [valid, setValid] = React.useState([false, false, false, false]);
+
+    const initialRef = React.useRef(null);
+
+    return (<Modal isOpen={props.isOpen} onClose={props.onClose} initialFocusRef={initialRef}>
         <ModalOverlay>
             <ModalContent>
                 <ModalHeader>Nova Tarefa</ModalHeader>
                 <ModalCloseButton />
                 <Flex justifyContent='center'>
                     <AspectRatio ratio={4 / 3} flex="1 1 auto" maxW={350}>
-                        {/* <Image src={[IMG1, IMG2, IMG3][tabIndex]}/> */}
                         <Box background={`url(${[IMG1, IMG1, IMG1][tabIndex]})`} backgroundSize='100% 100%' transition='background .5s linear' />
                     </AspectRatio>
                 </Flex>
-                <ModalBody pb={6}>
+                <ModalBody>
                     <Tabs
                         index={tabIndex}
                         onChange={setTabIndex}
@@ -54,29 +59,18 @@ const CreateWork = (props) => {
                         </TabList>
                         <TabPanels>
                             <TabPanel>
-                                <FormControl>
-                                    <FormLabel>Nome</FormLabel>
-                                    <Input placeholder='Nome'/>
-                                    <FormHelperText>Title to work.</FormHelperText>
-                                    {/* <FormErrorMessage>Email is required.</FormErrorMessage> */}
-                                </FormControl>
-                                <FormControl mt={4}>
-                                    <FormLabel>Description</FormLabel>
-
-                                    <Textarea resize='none' value={countChar} onChange={(e) => {
-                                        (250 - e.target.value.length) >= 0 && setCountChar(e.target.value)
-                                    }} />
-                                    <FormHelperText>Work description with {250 - countChar.length} characters.</FormHelperText>
-                                </FormControl>
+                                <Fade in={tabIndex === 0}>
+                                    <FormTask task={task} setTask={setTask} valid={valid} initialRef={initialRef}/>
+                                </Fade>
                             </TabPanel>
                             <TabPanel>
                                 <Fade in={tabIndex === 1}>
-                                    <CreateGoal/>
+                                    <FormGoal setGoal={setGoal} goal={goal} valid={valid} />
                                 </Fade>
                             </TabPanel>
                             <TabPanel>
                                 <Fade in={tabIndex === 2}>
-                                    <TagGUI />
+                                    <FormTag CurrentTags={CurrentTags} setCurrentTags={setCurrentTags} valid={valid} />
                                 </Fade>
                             </TabPanel>
                         </TabPanels>
@@ -86,7 +80,21 @@ const CreateWork = (props) => {
                     <Button
                         colorScheme='blue'
                         title={['Objetivos', 'Tags', 'Salvar'][tabIndex]}
-                        onClick={[() => setTabIndex(v => v + 1), () => setTabIndex(v => v + 1), () => { }][tabIndex]}
+                        onClick={() => {
+                            tabIndex === 2 && setValid(() => [task.title === '', task.desciption === '', goal.length === 0, CurrentTags.length === 0]);
+                            if (tabIndex === 2) {
+                                if (task.title !== '' && task.desciption !== '' && goal.length !== 0, CurrentTags.length !== 0) {
+                                    props.setEvents(v => v.concat([new Task(null, task.title, null, task.desciption, goal, CurrentTags)]))
+                                    setTask({ title: '', desciption: '' });
+                                    setCurrentTags([]);
+                                    setGoal([]);
+                                    setTabIndex(0);
+                                    setValid([false, false, false, false]);
+                                    props.onClose();
+                                }
+                            } else
+                                setTabIndex(v => v + 1);
+                        }}
                         rightIcon={[<BsArrowRightCircleFill />, <BsArrowRightCircleFill />, <MdOutlineSaveAlt />][tabIndex]}
                     >
                         {['Objetivos', 'Tags', 'Salvar'][tabIndex]}

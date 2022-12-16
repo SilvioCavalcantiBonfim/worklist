@@ -1,19 +1,17 @@
 import { Container, Flex, Input, IconButton, InputGroup, Divider, InputLeftElement, Heading, Center, InputRightElement, useDisclosure, Accordion } from '@chakra-ui/react';
 import React from 'react';
 import { FaPlus, FaSearch, FaBackspace } from "react-icons/fa"
-import { RiFilterFill } from "react-icons/ri"
-import Card from './components/Card/index2';
+import Card from './components/Card';
 import CreateWork from './components/createWork';
+import GoalEntity from './Entity/goalEntity';
 import TagEntity from './Entity/TagEntity';
-// import Task from './Entity/task';
+import Task from './Entity/taskEntity';
 import { ColorModeSwitcher } from './themeControl';
 
 function App() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [Events, setEvents] = React.useState(null);
-
   const [search, setSearch] = React.useState('');
-
-  const [tags, setTags] = React.useState([]);
 
   const HandleDelete = (id) => {
     setEvents(e => {
@@ -21,25 +19,40 @@ function App() {
     });
   }
 
+  const HandleFinishGoal = (i, g) => {
+    setEvents(e => {
+      const indexGoal = e[i].Goals.indexOf(g);
+      const GoalAux = e[i].Goals.map((e, ii) => (ii === indexGoal) ? new GoalEntity(g.ID, g.Description, true, Date.now()) : e)
+      return e.map((ee, ii) => (ii === i) ? new Task(ee.ID, ee.Name, ee.CreationDate, ee.Description, GoalAux, ee.Tags) : ee);
+    })
+  }
+
   React.useEffect(() => {
-    if (localStorage.getItem('tags') !== null)
-      setTags(JSON.parse(localStorage.getItem('tags')).map(e => new TagEntity(e.ID, e.Name, e.Color)));
-
-
-    if (localStorage.getItem('data') !== null)
-      setEvents(JSON.parse(localStorage.getItem('data')).map(e => e));
-    else
-      setEvents([]);
+    setEvents((v) => {
+      try {
+        const preloadEvents = JSON.parse(localStorage.getItem('data'));
+        return preloadEvents.map(e =>
+          new Task(
+            e.ID,
+            e.Name,
+            e.CreationDate,
+            e.Description,
+            (e.Goals !== undefined) ? e.Goals.map(ee => new GoalEntity(ee.ID, ee.Description, ee.State, ee.EndDate)) : [],
+            (e.Tags !== undefined) ? e.Tags.map(ee => new TagEntity(ee.ID, ee.Name, ee.Color)) : []
+          ));
+      } catch (error) {
+        localStorage.setItem('data', '[{"ID":"37b52293-2d32-644f-bb89-cec9a6172d54","Name":"Example","CreationDate":1670984768430,"Description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam placerat consectetur condimentum. Sed a quam euismod, laoreet tortor eu est.","Goals":[{"ID":"1eb128d2-f89c-ac64-96a4-62b7da8672a2","Description":"Lorem ipsum viverra.","State":false,"EndDate":null},{"ID":"1f14433e-7aa6-ee1a-fd5e-87b570eaa06a","Description":"Lorem ipsum viverra.","State":false,"EndDate":null},{"ID":"f8830476-e037-1fc3-7d33-66268acb1d6d","Description":"Lorem ipsum viverra.","State":false,"EndDate":null},{"ID":"a256c4af-f13a-c8c6-3dba-1fa1b099f919","Description":"Lorem ipsum viverra.","State":false,"EndDate":null}],"Tags":[{"ID":"0","Name":"Trabalho","Color":"red"},{"ID":"1","Name":"Pessoal","Color":"green"},{"ID":"66ee8711-4437-dbc6-86be-435a67a329f3","Name":"Lazer","Color":"yellow"}]}]')
+        return [{ "ID": "37b52293-2d32-644f-bb89-cec9a6172d54", "Name": "Example", "CreationDate": 1670984768430, "Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam placerat consectetur condimentum. Sed a quam euismod, laoreet tortor eu est.", "Goals": [{ "ID": "1eb128d2-f89c-ac64-96a4-62b7da8672a2", "Description": "Lorem ipsum viverra.", "State": false, "EndDate": null }, { "ID": "1f14433e-7aa6-ee1a-fd5e-87b570eaa06a", "Description": "Lorem ipsum viverra.", "State": false, "EndDate": null }, { "ID": "f8830476-e037-1fc3-7d33-66268acb1d6d", "Description": "Lorem ipsum viverra.", "State": false, "EndDate": null }, { "ID": "a256c4af-f13a-c8c6-3dba-1fa1b099f919", "Description": "Lorem ipsum viverra.", "State": false, "EndDate": null }], "Tags": [{ "ID": "0", "Name": "Trabalho", "Color": "red" }, { "ID": "1", "Name": "Pessoal", "Color": "green" }] }];
+      }
+    });
   }, []);
 
   React.useEffect(() => {
     Events !== null && localStorage.setItem('data', JSON.stringify(Events));
   }, [Events])
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (<>
-    <CreateWork isOpen={isOpen} onClose={onClose} />
+    <CreateWork isOpen={isOpen} onClose={onClose} setEvents={setEvents} />
     <Container maxW='container.md' minW='container.md' backdropFilter='blur(10px)' marginBottom='10px'>
       <Flex justifyContent='center'>
         <Heading as='h1' size='4xl' margin='15px'>Worklist</Heading>
@@ -64,79 +77,32 @@ function App() {
           icon={<FaPlus />}
           variant="ghost"
           color="current"
-          marginLeft="2"
+          ml={2}
           size="md"
           fontSize="lg"
           onClick={onOpen}
-        />
-        <IconButton
-          icon={<RiFilterFill />}
-          variant="ghost"
-          color="current"
-          marginRight="2"
-          size="md"
-          fontSize="lg"
         />
         <Center>
           <Divider orientation='vertical' />
         </Center>
         <ColorModeSwitcher />
       </Flex>
-      {(Events !== null && Events.length !== 0) && <Divider marginTop='10px' marginBottom='10px' />}
-      {/* <VStack spacing={4}>
-        {Events !== null && Events.map((e, i) => <CardEvent key={i} {...e} HandleDelete={HandleDelete} />)}
-      </VStack> */}
+      {(Events !== null && Events.length !== 0) && <Divider my={2}/>}
+
       <Accordion allowToggle>
-        {(Events !== null && Events.length !== 0) && events.map((e, i) => <Card key={i} {...e} HandleDelete={HandleDelete} />)}
+        {(Events !== null && Events.length !== 0) && Events.filter(e => {
+          const filter = search.split(' ');
+          let state = false || filter.length === 0;
+          filter.forEach(ee => {
+            state = state || e.Description.toLowerCase().includes(ee.toLowerCase()) || e.Name.toLowerCase().includes(ee.toLowerCase())
+            e.Goals.forEach(g => {
+              state = state || g.Description.toLowerCase().includes(ee.toLowerCase());
+            })
+          })
+          return state;
+        }).map((e, i) => <Card key={i} HandleFinishGoal={HandleFinishGoal} eventIndex={Events.indexOf(e)} {...e} query={search.split(' ')} HandleDelete={HandleDelete} />)}
       </Accordion>
     </Container>
   </>);
 }
-
-const events = [{
-  id: 0,
-  title: 'titulo',
-  DateTimeLocal: 'datetime-local',
-  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer porta vitae nisi ut semper. Phasellus facilisis augue at ultricies porttitor. Proin ac aliquet lectus, in volutpat orci. Vestibulum at est eu felis tempor dignissim vitae nec ligula. Vivamus molestie ligula felis, ultrices viverra nisi placerat ac. Duis congue ante mi.',
-  goals: [
-    {
-      id: 0,
-      description: 'teste 1',
-      state: false,
-      endDate: null
-    },
-    {
-      id: 1,
-      description: 'teste 2',
-      state: true,
-      endDate: 1
-    },
-    {
-      id: 2,
-      description: 'teste 3',
-      state: false,
-      endDate: null
-    },
-  ],
-  tag: []
-}, {
-  id: 5,
-  title: 'titulo',
-  DateTimeLocal: 'datetime-local',
-  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer porta vitae nisi ut semper. Phasellus facilisis augue at ultricies porttitor. Proin ac aliquet lectus, in volutpat orci. Vestibulum at est eu felis tempor dignissim vitae nec ligula. Vivamus molestie ligula felis, ultrices viverra nisi placerat ac. Duis congue ante mi.',
-  goals: [
-  ],
-  tag: [
-    // {ID:1, Color: 'gray', Name: 'tag' },
-    { color: 'red', name: 'tag' },
-    { color: 'orange', name: 'tag' },
-    { color: 'yellow', name: 'tag' },
-    { color: 'green', name: 'tag' },
-    { color: 'teal', name: 'tag' },
-    { color: 'blue', name: 'tag' },
-    { color: 'cyan', name: 'tag' },
-    { color: 'purple', name: 'tag' },
-    { color: 'pink', name: 'tag' }]
-}]
-
 export default App;

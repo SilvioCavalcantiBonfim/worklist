@@ -1,39 +1,47 @@
-import { 
-    Button, 
-    Flex, 
-    FormControl, 
-    FormErrorMessage, 
-    FormLabel, 
-    Input, 
-    Popover, 
-    PopoverArrow, 
-    PopoverBody, 
-    PopoverContent, 
-    PopoverTrigger, 
-    Select, 
-    Tag, 
-    TagLabel, 
-    TagLeftIcon, 
-    useDisclosure } from "@chakra-ui/react";
+import {
+    Button,
+    Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    Popover,
+    PopoverArrow,
+    PopoverBody,
+    PopoverContent,
+    PopoverTrigger,
+    Select,
+    Tag,
+    TagLabel,
+    TagLeftIcon,
+    useDisclosure
+} from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { AiFillTag } from "react-icons/ai";
 import { RiAddFill } from "react-icons/ri";
 import TagEntity from "../../Entity/TagEntity";
 
-const CreateTag = (props) => {
+const FormTagCreate = (props) => {
 
     const [tagOptions, setTagOption] = React.useState({ Name: '', Color: 'gray' });
     const { isOpen, onToggle, onClose } = useDisclosure();
+    const initialFocusRef = React.useRef()
 
     return (<Popover
         returnFocusOnClose={false}
+        initialFocusRef={initialFocusRef}
         isOpen={isOpen}
         onClose={onClose}
         closeOnBlur={false}
     >
         <PopoverTrigger>
-            <Button w='30%' borderRadius='full' boxShadow='size' justifyContent='center' onClick={onToggle}><RiAddFill/></Button>
+            <Button
+                w='30%'
+                boxShadow='size'
+                justifyContent='center'
+                onClick={onToggle}
+            ><RiAddFill /></Button>
         </PopoverTrigger>
         <PopoverContent>
             <PopoverArrow />
@@ -48,12 +56,13 @@ const CreateTag = (props) => {
                     }}
                 >
                     {(props) => (<Form>
-                        <Field name='Name' validate={(v) => !v?'O nome é obrigatório.':undefined}>
+                        <Field name='Name' validate={(v) => !v ? 'O nome é obrigatório.' : undefined}>
                             {({ field, form }) => {
                                 return (
                                     <FormControl isInvalid={form.errors.Name && form.touched.Name} mt={4}>
                                         <FormLabel>Nome</FormLabel>
                                         <Input
+                                            ref={initialFocusRef}
                                             onChange={(e) => {
                                                 field.onChange(e);
                                                 setTagOption(v => { return { ...v, Name: e.target.value } })
@@ -88,7 +97,7 @@ const CreateTag = (props) => {
                                 </FormControl>
                             )}
                         </Field>
-                        <Flex flex={1} justifyContent='center' mt={4} mb={4}>
+                        <Flex flex={1} justifyContent='center' my={4}>
                             <Tag
                                 size='lg'
                                 variant='subtle'
@@ -111,4 +120,4 @@ const CreateTag = (props) => {
     </Popover>);
 }
 
-export default CreateTag;
+export default FormTagCreate;
