@@ -1,5 +1,5 @@
 {
-    "project": "Asteroids",
-    "frameworks": ["createreactapp"],
-    "description": "Sistema em javascript baseado no jogo asteroids."
+    "project": "Worklist",
+    "frameworks": ["createreactapp", "chakraui"],
+    "description": "Sistema de lista de tarefas com armazenamento local."
 }
