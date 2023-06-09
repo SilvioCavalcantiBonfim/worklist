@@ -1,5 +1,19 @@
 {
     "project": "Worklist",
-    "frameworks": ["createreactapp", "chakraui"],
-    "description": "Sistema de lista de tarefas com armazenamento local."
+    "technologies": [
+        {
+            "name": "React",
+            "iconUrl": "https://cdn.simpleicons.org/react"
+        },
+        {
+            "name": "Chakra UI",
+            "iconUrl": "https://cdn.simpleicons.org/chakraui"
+        }
+    ],
+    "description": "Sistema de lista de tarefas com armazenamento local.",
+    "deploy": [{
+        "url": "https://silviocavalcantibonfim.github.io/worklist/",
+        "urlIcon":"https://cdn.simpleicons.org/githubpages"
+    }],
+    "thumbnailUrl": "https://raw.githubusercontent.com/SilvioCavalcantiBonfim/worklist/0.5.0/thumb.png"
 }
